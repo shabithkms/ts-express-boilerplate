@@ -1,0 +1,22 @@
+FROM node:lts-alpine3.15 AS base
+
+WORKDIR /app
+COPY . .
+COPY package*.json ./
+# COPY package-lock.json ./
+EXPOSE 8080
+
+FROM base AS production
+ENV NODE_ENV=production
+RUN npm ci --only=production
+CMD ["npm", "start"]
+
+FROM base AS dev
+ENV NODE_ENV=development
+# timezone env with default
+ENV TZ="Asia/Dubai"
+RUN apk add --no-cache python3 make g++
+RUN npm install
+# RUN npm install -g nodemon
+# CMD sh -c 'npm install && npm run dev'
+CMD ["npm", "run", "dev"]
